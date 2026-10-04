@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StudyBuddy — Focus Timer, Flashcards & Quiz Tracker</title>
-  <meta name="description" content="A minimalist, powerful study buddy app featuring a Pomodoro focus timer, 3D flashcards, quiz generator, daily streak tracking, and study analytics.">
+  <meta name="description"
+    content="A minimalist, powerful study buddy app featuring a Pomodoro focus timer, 3D flashcards, quiz generator, daily streak tracking, and study analytics.">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <!-- Confetti Celebration Canvas -->
   <canvas id="confetti-canvas"></canvas>
@@ -107,7 +112,8 @@
 
           <!-- Current Focus Task Input -->
           <div class="current-task-box">
-            <input type="text" id="pomo-current-task" class="task-input" placeholder="🎯 What are you studying right now?" maxlength="80">
+            <input type="text" id="pomo-current-task" class="task-input"
+              placeholder="🎯 What are you studying right now?" maxlength="80">
           </div>
 
           <!-- Controls -->
@@ -190,7 +196,8 @@
                 </div>
 
                 <div class="card-content-center">
-                  <div class="card-main-text" id="card-front-text">What is the Big-O time complexity of binary search?</div>
+                  <div class="card-main-text" id="card-front-text">What is the Big-O time complexity of binary search?
+                  </div>
                 </div>
 
                 <div class="card-instruction">
@@ -206,34 +213,41 @@
                 </div>
 
                 <div class="card-content-center">
-                  <div class="card-main-text" id="card-back-text">O(log n) — because each step halves the remaining elements.</div>
+                  <div class="card-main-text" id="card-back-text">O(log n) — because each step halves the remaining
+                    elements.</div>
                 </div>
 
                 <div class="card-instruction">
-                  <span>Press</span> <span class="kbd-chip">← Need Review</span> <span>or</span> <span class="kbd-chip">Mastered →</span>
+                  <span>Press</span> <span class="kbd-chip">← Need Review</span> <span>or</span> <span
+                    class="kbd-chip">Mastered →</span>
                 </div>
               </div>
             </div>
 
             <!-- Empty State for Decks -->
-            <div id="flashcards-empty-state" style="display: none; text-align: center; padding: 4rem 2rem; background: var(--bg-card); border-radius: var(--radius-xl); border: 1px dashed var(--border-subtle);">
+            <div id="flashcards-empty-state"
+              style="display: none; text-align: center; padding: 4rem 2rem; background: var(--bg-card); border-radius: var(--radius-xl); border: 1px dashed var(--border-subtle);">
               <div style="font-size: 3rem; margin-bottom: 1rem;">🗂️</div>
               <h3 style="margin-bottom: 0.5rem;">No Flashcards In This Deck</h3>
-              <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Add your first card to start practicing or switch to another deck.</p>
-              <button class="btn-primary" onclick="document.getElementById('btn-modal-add-card').click()">+ Add Flashcard</button>
+              <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Add your first card to start practicing or
+                switch to another deck.</p>
+              <button class="btn-primary" onclick="document.getElementById('btn-modal-add-card').click()">+ Add
+                Flashcard</button>
             </div>
           </div>
 
           <!-- Action Buttons Bar -->
           <div class="card-actions-bar">
-            <button class="review-btn btn-need-review no-flip" id="btn-card-review" title="Mark for review (Shortcut: Left Arrow)">
+            <button class="review-btn btn-need-review no-flip" id="btn-card-review"
+              title="Mark for review (Shortcut: Left Arrow)">
               <span>🔄</span>
               <span>Need Review (1)</span>
             </button>
             <button class="btn-flip no-flip" id="btn-card-flip" title="Flip card (Shortcut: Space)">
               <span>🔁 Flip</span>
             </button>
-            <button class="review-btn btn-mastered no-flip" id="btn-card-mastered" title="Mark as mastered (Shortcut: Right Arrow)">
+            <button class="review-btn btn-mastered no-flip" id="btn-card-mastered"
+              title="Mark as mastered (Shortcut: Right Arrow)">
               <span>✨</span>
               <span>Mastered (2)</span>
             </button>
@@ -255,7 +269,8 @@
         <div id="flashcards-manager-view" class="deck-manager-view" style="display: none;">
           <div class="deck-manager-header">
             <h3>🗂️ Manage Deck Cards</h3>
-            <button class="btn-secondary" onclick="document.getElementById('btn-modal-add-card').click()">+ New Card</button>
+            <button class="btn-secondary" onclick="document.getElementById('btn-modal-add-card').click()">+ New
+              Card</button>
           </div>
 
           <div class="cards-table-container">
@@ -283,7 +298,8 @@
         <!-- SETUP VIEW -->
         <div id="quiz-setup-section" class="quiz-setup-card">
           <h2 class="quiz-hero-title">Interactive Quiz Master</h2>
-          <p class="quiz-hero-desc">Test your knowledge with instant multiple choice quizzes generated directly from your flashcards or curated test sets.</p>
+          <p class="quiz-hero-desc">Test your knowledge with instant multiple choice quizzes generated directly from
+            your flashcards or curated test sets.</p>
 
           <div class="quiz-mode-cards">
             <div class="quiz-mode-box selected" data-quiz-mode="flashcards">
@@ -363,11 +379,13 @@
           </div>
 
           <h2 id="result-title-text" style="font-size: 1.6rem; margin-bottom: 0.5rem;">Outstanding!</h2>
-          <p id="result-desc-text" style="color: var(--text-muted); margin-bottom: 2rem;">You've mastered this set with flying colors.</p>
+          <p id="result-desc-text" style="color: var(--text-muted); margin-bottom: 2rem;">You've mastered this set with
+            flying colors.</p>
 
           <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
             <button class="btn-primary" id="btn-retake-quiz">🔄 Take Another Quiz</button>
-            <button class="btn-secondary" onclick="document.querySelector('[data-tab=\'progress\']').click()">📊 View Study Progress</button>
+            <button class="btn-secondary" onclick="document.querySelector('[data-tab=\'progress\']').click()">📊 View
+              Study Progress</button>
           </div>
         </div>
       </div>
@@ -391,7 +409,9 @@
 
           <!-- Weekly Activity Circles -->
           <div>
-            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; text-align: right;">This Week's Activity</div>
+            <div
+              style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; text-align: right;">
+              This Week's Activity</div>
             <div class="week-strip" id="week-days-strip">
               <!-- Rendered via JS -->
             </div>
@@ -478,10 +498,12 @@
         <div class="history-card col-6">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <h3 style="font-size: 1.15rem; font-weight: 700;">🏆 Best Record</h3>
-            <span id="streak-best-num" style="font-size: 1rem; font-weight: 800; color: #ff8c00; font-family: var(--font-mono);">1 Day</span>
+            <span id="streak-best-num"
+              style="font-size: 1rem; font-weight: 800; color: #ff8c00; font-family: var(--font-mono);">1 Day</span>
           </div>
           <p style="font-size: 0.86rem; color: var(--text-muted); margin-top: 0.4rem;">
-            Consistency builds mastery. Studying just 15 minutes each day keeps your mind sharp and your streak unbroken.
+            Consistency builds mastery. Studying just 15 minutes each day keeps your mind sharp and your streak
+            unbroken.
           </p>
           <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
             <button class="btn-secondary" id="btn-export-data">📥 Export Data (JSON)</button>
@@ -552,7 +574,8 @@
           </div>
           <div class="form-group">
             <label for="input-card-question">Front: Question or Term</label>
-            <textarea id="input-card-question" class="form-textarea" placeholder="e.g. What is the capital of France?" required></textarea>
+            <textarea id="input-card-question" class="form-textarea" placeholder="e.g. What is the capital of France?"
+              required></textarea>
           </div>
           <div class="form-group">
             <label for="input-card-answer">Back: Answer or Definition</label>
@@ -582,7 +605,8 @@
           </div>
           <div class="form-group">
             <label for="input-deck-desc">Description (optional):</label>
-            <input type="text" id="input-deck-desc" class="form-input" placeholder="e.g. Bones, organs, and physiological systems">
+            <input type="text" id="input-deck-desc" class="form-input"
+              placeholder="e.g. Bones, organs, and physiological systems">
           </div>
         </div>
         <div class="modal-footer">
@@ -608,7 +632,8 @@
           </div>
           <div class="form-group">
             <label for="input-q1-text">Question Prompt:</label>
-            <textarea id="input-q1-text" class="form-textarea" placeholder="e.g. What is the process of cell division called?" required></textarea>
+            <textarea id="input-q1-text" class="form-textarea"
+              placeholder="e.g. What is the process of cell division called?" required></textarea>
           </div>
           <div class="form-group">
             <label for="input-q1-correct">Correct Answer:</label>
@@ -643,4 +668,5 @@
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
+
 </html>
