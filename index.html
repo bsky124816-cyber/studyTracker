@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyBuddy — Focus Timer, Flashcards & Quiz Tracker</title>
+  <meta name="description" content="A minimalist, powerful study buddy app featuring a Pomodoro focus timer, 3D flashcards, quiz generator, daily streak tracking, and study analytics.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Confetti Celebration Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand-section">
+        <span class="brand-icon">⚡</span>
+        <div>
+          <h1 class="brand-title">StudyBuddy</h1>
+          <p class="brand-tagline">Focus • Learn • Retain</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Streak Counter Badge -->
+        <div class="streak-badge" id="header-streak-badge" title="Daily Study Streak">
+          <span class="streak-flame">🔥</span>
+          <span class="streak-count" id="header-streak-count">1</span>
+          <span class="streak-label">Day Streak</span>
+        </div>
+
+        <!-- Ambient Rain Toggle -->
+        <button class="btn-icon-header" id="btn-ambient-rain" title="Toggle Lo-Fi Study Rain Ambience">
+          🌧️
+        </button>
+
+        <!-- Sound Effects Toggle -->
+        <button class="btn-icon-header active" id="btn-toggle-mute" title="Toggle Sound Effects">
+          🔊
+        </button>
+
+        <!-- Theme Toggle -->
+        <button class="btn-icon-header" id="btn-toggle-theme" title="Toggle Dark/Light Mode">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="main-nav" aria-label="Main Navigation">
+      <button class="nav-tab active" data-tab="pomodoro">
+        <span class="tab-icon">⏱️</span>
+        <span>Pomodoro</span>
+      </button>
+      <button class="nav-tab" data-tab="flashcards">
+        <span class="tab-icon">🗂️</span>
+        <span>Flashcards</span>
+      </button>
+      <button class="nav-tab" data-tab="quiz">
+        <span class="tab-icon">🎯</span>
+        <span>Quiz</span>
+      </button>
+      <button class="nav-tab" data-tab="progress">
+        <span class="tab-icon">📊</span>
+        <span>Progress & Streak</span>
+      </button>
+    </nav>
+
+    <!-- ============================================================
+         TAB 1: POMODORO TIMER
+         ============================================================ -->
+    <main id="tab-pomodoro" class="tab-content active">
+      <div class="pomo-wrapper">
+        <div class="pomo-card">
+          <!-- Mode Switcher -->
+          <div class="timer-modes" role="tablist">
+            <button class="mode-btn active" data-mode="pomo">Focus (25m)</button>
+            <button class="mode-btn" data-mode="short">Short Break (5m)</button>
+            <button class="mode-btn" data-mode="long">Long Break (15m)</button>
+          </div>
+
+          <!-- Circular SVG Timer -->
+          <div class="timer-circle-wrap">
+            <svg class="timer-svg" viewBox="0 0 240 240">
+              <defs>
+                <linearGradient id="timerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#6366f1" />
+                  <stop offset="50%" stop-color="#8b5cf6" />
+                  <stop offset="100%" stop-color="#d946ef" />
+                </linearGradient>
+              </defs>
+              <circle class="timer-track" cx="120" cy="120" r="110" />
+              <circle class="timer-progress" id="timer-progress-circle" cx="120" cy="120" r="110" />
+            </svg>
+            <div class="timer-display">
+              <div class="timer-digits" id="timer-digits">25:00</div>
+              <div class="timer-status" id="timer-status-text">Focus Session</div>
+            </div>
+          </div>
+
+          <!-- Current Focus Task Input -->
+          <div class="current-task-box">
+            <input type="text" id="pomo-current-task" class="task-input" placeholder="🎯 What are you studying right now?" maxlength="80">
+          </div>
+
+          <!-- Controls -->
+          <div class="timer-controls">
+            <button class="btn-secondary" id="btn-timer-reset" title="Reset current session">
+              <span>🔄</span>
+              <span>Reset</span>
+            </button>
+            <button class="btn-primary" id="btn-timer-toggle">
+              <span>▶️</span>
+              <span>Start Focus</span>
+            </button>
+            <button class="btn-secondary" id="btn-timer-skip" title="Skip to next session">
+              <span>⏭️</span>
+              <span>Skip</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Secondary Pomo Bar -->
+        <div class="pomo-secondary-bar">
+          <div class="pomo-session-tracker">
+            <span>Cycle:</span>
+            <div class="session-dots" id="pomo-session-dots"></div>
+            <span id="pomo-today-count" style="margin-left: 0.5rem; color: var(--text-dim);">0 today</span>
+          </div>
+
+          <div class="ambience-controls">
+            <button class="ambience-btn" id="btn-timer-settings">
+              <span>⚙️</span>
+              <span>Customize Timers</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============================================================
+         TAB 2: FLASHCARDS
+         ============================================================ -->
+    <section id="tab-flashcards" class="tab-content">
+      <div class="flashcards-container">
+        <!-- Deck Toolbar -->
+        <div class="deck-toolbar">
+          <div class="deck-select-group">
+            <label for="deck-select">Deck:</label>
+            <select id="deck-select" class="custom-select"></select>
+          </div>
+
+          <div class="deck-actions">
+            <button class="btn-secondary" id="btn-shuffle-deck" title="Shuffle flashcards">
+              <span>🔀</span>
+              <span>Shuffle</span>
+            </button>
+            <button class="btn-secondary" id="btn-modal-add-card">
+              <span>➕</span>
+              <span>Add Card</span>
+            </button>
+            <button class="btn-secondary" id="btn-modal-new-deck">
+              <span>📁</span>
+              <span>New Deck</span>
+            </button>
+            <button class="btn-secondary" id="btn-toggle-deck-manager">
+              <span>🗂️</span>
+              <span>Manage Cards</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- STUDY VIEW -->
+        <div id="flashcards-study-view">
+          <!-- 3D Card Viewport -->
+          <div class="study-viewport">
+            <div class="flashcard-3d" id="flashcard-3d-element">
+              <!-- Front Face (Question) -->
+              <div class="card-face card-face-front">
+                <div class="card-badge-row">
+                  <span class="card-type-tag">Question</span>
+                  <div class="card-status-dot" id="card-status-dot" title="Learning status"></div>
+                </div>
+
+                <div class="card-content-center">
+                  <div class="card-main-text" id="card-front-text">What is the Big-O time complexity of binary search?</div>
+                </div>
+
+                <div class="card-instruction">
+                  <span>💡 Click card or press</span> <span class="kbd-chip">Space</span> <span>to reveal answer</span>
+                </div>
+              </div>
+
+              <!-- Back Face (Answer) -->
+              <div class="card-face card-face-back">
+                <div class="card-badge-row">
+                  <span class="card-type-tag answer-tag">Answer</span>
+                  <span style="font-size: 0.8rem; color: var(--text-dim);">Solution & Context</span>
+                </div>
+
+                <div class="card-content-center">
+                  <div class="card-main-text" id="card-back-text">O(log n) — because each step halves the remaining elements.</div>
+                </div>
+
+                <div class="card-instruction">
+                  <span>Press</span> <span class="kbd-chip">← Need Review</span> <span>or</span> <span class="kbd-chip">Mastered →</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State for Decks -->
+            <div id="flashcards-empty-state" style="display: none; text-align: center; padding: 4rem 2rem; background: var(--bg-card); border-radius: var(--radius-xl); border: 1px dashed var(--border-subtle);">
+              <div style="font-size: 3rem; margin-bottom: 1rem;">🗂️</div>
+              <h3 style="margin-bottom: 0.5rem;">No Flashcards In This Deck</h3>
+              <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Add your first card to start practicing or switch to another deck.</p>
+              <button class="btn-primary" onclick="document.getElementById('btn-modal-add-card').click()">+ Add Flashcard</button>
+            </div>
+          </div>
+
+          <!-- Action Buttons Bar -->
+          <div class="card-actions-bar">
+            <button class="review-btn btn-need-review no-flip" id="btn-card-review" title="Mark for review (Shortcut: Left Arrow)">
+              <span>🔄</span>
+              <span>Need Review (1)</span>
+            </button>
+            <button class="btn-flip no-flip" id="btn-card-flip" title="Flip card (Shortcut: Space)">
+              <span>🔁 Flip</span>
+            </button>
+            <button class="review-btn btn-mastered no-flip" id="btn-card-mastered" title="Mark as mastered (Shortcut: Right Arrow)">
+              <span>✨</span>
+              <span>Mastered (2)</span>
+            </button>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="card-progress-section">
+            <div class="progress-header">
+              <span id="card-counter-label">Card 1 of 5</span>
+              <span>Progress</span>
+            </div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" id="card-progress-fill" style="width: 20%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DECK MANAGER TABLE VIEW -->
+        <div id="flashcards-manager-view" class="deck-manager-view" style="display: none;">
+          <div class="deck-manager-header">
+            <h3>🗂️ Manage Deck Cards</h3>
+            <button class="btn-secondary" onclick="document.getElementById('btn-modal-add-card').click()">+ New Card</button>
+          </div>
+
+          <div class="cards-table-container">
+            <table class="cards-table">
+              <thead>
+                <tr>
+                  <th style="width: 45%;">Question / Prompt</th>
+                  <th style="width: 40%;">Answer</th>
+                  <th style="width: 10%;">Status</th>
+                  <th style="width: 5%; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="cards-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB 3: QUIZ
+         ============================================================ -->
+    <section id="tab-quiz" class="tab-content">
+      <div class="quiz-wrapper">
+        <!-- SETUP VIEW -->
+        <div id="quiz-setup-section" class="quiz-setup-card">
+          <h2 class="quiz-hero-title">Interactive Quiz Master</h2>
+          <p class="quiz-hero-desc">Test your knowledge with instant multiple choice quizzes generated directly from your flashcards or curated test sets.</p>
+
+          <div class="quiz-mode-cards">
+            <div class="quiz-mode-box selected" data-quiz-mode="flashcards">
+              <h4>🗂️ From Flashcards</h4>
+              <p>Converts your study decks into smart multiple-choice questions automatically.</p>
+            </div>
+            <div class="quiz-mode-box" data-quiz-mode="custom">
+              <h4>📝 Custom Quizzes</h4>
+              <p>Handcrafted quizzes with specific questions and explanations.</p>
+            </div>
+          </div>
+
+          <!-- Flashcard Quiz Options -->
+          <div id="quiz-options-flashcards">
+            <div class="form-group" style="margin-bottom: 1.2rem;">
+              <label for="quiz-deck-select">Select Flashcard Deck to Quiz From:</label>
+              <select id="quiz-deck-select" class="custom-select"></select>
+            </div>
+            <div class="form-group" style="margin-bottom: 1.8rem;">
+              <label for="quiz-question-count">Number of Questions:</label>
+              <select id="quiz-question-count" class="custom-select">
+                <option value="5">5 Questions (Sprint)</option>
+                <option value="10">10 Questions (Standard)</option>
+                <option value="20">20 Questions (Deep Dive)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Custom Quiz Options -->
+          <div id="quiz-options-custom" style="display: none;">
+            <div class="form-group" style="margin-bottom: 1.2rem;">
+              <label for="custom-quiz-select">Select Quiz:</label>
+              <select id="custom-quiz-select" class="custom-select"></select>
+            </div>
+            <div style="margin-bottom: 1.8rem;">
+              <button class="btn-secondary" id="btn-modal-new-quiz">+ Create New Custom Quiz</button>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="btn-start-quiz" style="width: 100%; justify-content: center;">
+            🚀 Start Quiz Now
+          </button>
+        </div>
+
+        <!-- ACTIVE QUIZ PLAYER -->
+        <div id="quiz-player-section" class="quiz-player-card" style="display: none;">
+          <div class="quiz-player-header">
+            <span id="quiz-current-num" style="font-weight: 700; color: var(--text-muted);">Question 1 of 5</span>
+            <span class="quiz-score-badge" id="quiz-score-indicator">Score: 0</span>
+          </div>
+
+          <!-- Progress -->
+          <div class="progress-bar-track" style="margin-bottom: 1.8rem;">
+            <div class="progress-bar-fill" id="quiz-progress-fill" style="width: 0%;"></div>
+          </div>
+
+          <div class="quiz-question-box">
+            <h3 class="quiz-question-prompt" id="quiz-prompt-text">What is the capital of Australia?</h3>
+          </div>
+
+          <div class="quiz-options-list" id="quiz-options-container">
+            <!-- Options dynamically injected -->
+          </div>
+
+          <div class="quiz-feedback-box" id="quiz-feedback-box"></div>
+
+          <div style="display: flex; justify-content: flex-end;">
+            <button class="btn-primary" id="btn-quiz-next" style="display: none;">Next Question →</button>
+          </div>
+        </div>
+
+        <!-- RESULTS VIEW -->
+        <div id="quiz-results-section" class="quiz-results-card" style="display: none;">
+          <div class="result-score-circle">
+            <div class="score-percent" id="result-percent-text">100%</div>
+            <div class="score-fraction" id="result-fraction-text">5 / 5 Correct</div>
+          </div>
+
+          <h2 id="result-title-text" style="font-size: 1.6rem; margin-bottom: 0.5rem;">Outstanding!</h2>
+          <p id="result-desc-text" style="color: var(--text-muted); margin-bottom: 2rem;">You've mastered this set with flying colors.</p>
+
+          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <button class="btn-primary" id="btn-retake-quiz">🔄 Take Another Quiz</button>
+            <button class="btn-secondary" onclick="document.querySelector('[data-tab=\'progress\']').click()">📊 View Study Progress</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         TAB 4: PROGRESS & STREAK TRACKER
+         ============================================================ -->
+    <section id="tab-progress" class="tab-content">
+      <div class="progress-grid">
+        <!-- Streak Hero Card -->
+        <div class="streak-hero-card col-full">
+          <div class="streak-hero-left">
+            <span class="streak-giant-flame" id="streak-giant-flame">🔥</span>
+            <div>
+              <div class="streak-days-num" id="streak-hero-days">1</div>
+              <div class="streak-hero-title">Days Study Streak</div>
+              <p class="streak-subtitle" id="streak-status-subtitle">Study today to keep your streak burning!</p>
+            </div>
+          </div>
+
+          <!-- Weekly Activity Circles -->
+          <div>
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; text-align: right;">This Week's Activity</div>
+            <div class="week-strip" id="week-days-strip">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Metric Card 1: Focus Time -->
+        <div class="stat-card col-4">
+          <div class="stat-icon-wrap icon-time">⏱️</div>
+          <div>
+            <div class="stat-value" id="metric-focus-time">0m</div>
+            <div class="stat-label">Total Focus Time</div>
+          </div>
+        </div>
+
+        <!-- Metric Card 2: Completed Pomodoros -->
+        <div class="stat-card col-4">
+          <div class="stat-icon-wrap icon-pomo">🍅</div>
+          <div>
+            <div class="stat-value" id="metric-pomos-count">0</div>
+            <div class="stat-label">Completed Sessions</div>
+          </div>
+        </div>
+
+        <!-- Metric Card 3: Flashcards Mastered -->
+        <div class="stat-card col-4">
+          <div class="stat-icon-wrap icon-cards">🗂️</div>
+          <div>
+            <div class="stat-value" id="metric-cards-mastered">0 / 0</div>
+            <div class="stat-label">Cards Mastered</div>
+          </div>
+        </div>
+
+        <!-- Metric Card 4: Quiz Performance -->
+        <div class="stat-card col-4">
+          <div class="stat-icon-wrap icon-quiz">🎯</div>
+          <div>
+            <div class="stat-value" id="metric-quiz-avg">0%</div>
+            <div class="stat-label">Average Quiz Score</div>
+          </div>
+        </div>
+
+        <!-- Daily Goal Tracker Card -->
+        <div class="goals-card col-8">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1.15rem; font-weight: 700;">🎯 Today's Goals</h3>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Daily Targets</span>
+          </div>
+
+          <div class="goals-list">
+            <div class="goal-item-row">
+              <div class="goal-meta">
+                <span>🍅 Focus Sessions</span>
+                <span id="goal-pomo-label">0 / 4</span>
+              </div>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="goal-pomo-bar" style="width: 0%; background: #f43f5e;"></div>
+              </div>
+            </div>
+
+            <div class="goal-item-row">
+              <div class="goal-meta">
+                <span>🗂️ Flashcards Reviewed</span>
+                <span id="goal-card-label">0 / 15</span>
+              </div>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="goal-card-bar" style="width: 0%; background: #8b5cf6;"></div>
+              </div>
+            </div>
+
+            <div class="goal-item-row">
+              <div class="goal-meta">
+                <span>🎯 Quizzes Completed</span>
+                <span id="goal-quiz-label">0 / 1</span>
+              </div>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="goal-quiz-bar" style="width: 0%; background: #10b981;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Best Streak & Activity Log -->
+        <div class="history-card col-6">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1.15rem; font-weight: 700;">🏆 Best Record</h3>
+            <span id="streak-best-num" style="font-size: 1rem; font-weight: 800; color: #ff8c00; font-family: var(--font-mono);">1 Day</span>
+          </div>
+          <p style="font-size: 0.86rem; color: var(--text-muted); margin-top: 0.4rem;">
+            Consistency builds mastery. Studying just 15 minutes each day keeps your mind sharp and your streak unbroken.
+          </p>
+          <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <button class="btn-secondary" id="btn-export-data">📥 Export Data (JSON)</button>
+            <button class="btn-secondary" id="btn-import-data">📤 Import Data</button>
+            <input type="file" id="file-input-import" accept=".json" style="display: none;">
+            <button class="btn-secondary" id="btn-reset-data" style="color: var(--danger);">⚠️ Reset Data</button>
+          </div>
+        </div>
+
+        <!-- Recent Activity Feed -->
+        <div class="history-card col-6">
+          <h3 style="font-size: 1.15rem; font-weight: 700;">📜 Activity Log</h3>
+          <div class="activity-timeline" id="activity-timeline-list">
+            <!-- Timeline items injected via JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============================================================
+       MODALS
+       ============================================================ -->
+  <!-- Timer Settings Modal -->
+  <div class="modal-overlay" id="modal-timer-settings">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title">⚙️ Timer Settings</h3>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="input-setting-pomo">Focus Duration (minutes):</label>
+          <input type="number" id="input-setting-pomo" class="form-input" min="1" max="120" value="25">
+        </div>
+        <div class="form-group">
+          <label for="input-setting-short">Short Break (minutes):</label>
+          <input type="number" id="input-setting-short" class="form-input" min="1" max="60" value="5">
+        </div>
+        <div class="form-group">
+          <label for="input-setting-long">Long Break (minutes):</label>
+          <input type="number" id="input-setting-long" class="form-input" min="1" max="90" value="15">
+        </div>
+        <div class="form-group">
+          <label for="input-setting-interval">Long Break Interval (cycles):</label>
+          <input type="number" id="input-setting-interval" class="form-input" min="1" max="12" value="4">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary btn-cancel-modal">Cancel</button>
+        <button class="btn-primary" id="btn-save-timer-settings">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Flashcard Modal -->
+  <div class="modal-overlay" id="modal-add-card">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title">➕ Add New Flashcard</h3>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+      <form id="form-add-card">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="input-card-deck">Target Deck:</label>
+            <select id="input-card-deck" class="form-input"></select>
+          </div>
+          <div class="form-group">
+            <label for="input-card-question">Front: Question or Term</label>
+            <textarea id="input-card-question" class="form-textarea" placeholder="e.g. What is the capital of France?" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="input-card-answer">Back: Answer or Definition</label>
+            <textarea id="input-card-answer" class="form-textarea" placeholder="e.g. Paris" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn-primary">Add Card</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- New Deck Modal -->
+  <div class="modal-overlay" id="modal-new-deck">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title">📁 Create New Deck</h3>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+      <form id="form-new-deck">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="input-deck-name">Deck Name:</label>
+            <input type="text" id="input-deck-name" class="form-input" placeholder="e.g. 🩺 Human Anatomy" required>
+          </div>
+          <div class="form-group">
+            <label for="input-deck-desc">Description (optional):</label>
+            <input type="text" id="input-deck-desc" class="form-input" placeholder="e.g. Bones, organs, and physiological systems">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn-primary">Create Deck</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- New Custom Quiz Modal -->
+  <div class="modal-overlay" id="modal-new-quiz">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-title">📝 Create Custom Quiz Question</h3>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+      <form id="form-new-quiz">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="input-quiz-title">Quiz Category / Title:</label>
+            <input type="text" id="input-quiz-title" class="form-input" placeholder="e.g. Biology Checkup" required>
+          </div>
+          <div class="form-group">
+            <label for="input-q1-text">Question Prompt:</label>
+            <textarea id="input-q1-text" class="form-textarea" placeholder="e.g. What is the process of cell division called?" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="input-q1-correct">Correct Answer:</label>
+            <input type="text" id="input-q1-correct" class="form-input" placeholder="e.g. Mitosis" required>
+          </div>
+          <div class="form-group">
+            <label for="input-q1-w1">Wrong Option 1:</label>
+            <input type="text" id="input-q1-w1" class="form-input" placeholder="e.g. Osmosis" required>
+          </div>
+          <div class="form-group">
+            <label for="input-q1-w2">Wrong Option 2:</label>
+            <input type="text" id="input-q1-w2" class="form-input" placeholder="e.g. Synthesis">
+          </div>
+          <div class="form-group">
+            <label for="input-q1-w3">Wrong Option 3:</label>
+            <input type="text" id="input-q1-w3" class="form-input" placeholder="e.g. Glycolysis">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn-primary">Save Quiz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="audio.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
